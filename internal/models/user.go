@@ -4,9 +4,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type jsonResponse map[string]any
-
 type UserRegistrationData struct {
+	Email           string `json:"email"`
 	Username        string `json:"username"`
 	Name            string `json:"name"`
 	Password        string `json:"password"`
@@ -20,3 +19,4 @@ type UserModel struct {
 // func (u *UserModel) NewUser(data UserRegistrationData) (jsonResponse, error) {
 
 // }
+

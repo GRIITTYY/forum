@@ -1,3 +1,3 @@
 ```bash
-sudo -u postgres psql -f internals/database/init_db.sql
+sudo -u postgres psql -f internal/database/init_db.sql
 ```

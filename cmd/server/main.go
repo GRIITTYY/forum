@@ -35,7 +35,7 @@ func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 	dbPool, err := database.NewDB(*connString)
 	if err != nil {
-		logger.Error("Erro creating Database Pool", "msg", err.Error())
+		logger.Error("Error creating Database Pool", "error", err.Error())
 		os.Exit(1)
 	}
 
@@ -52,7 +52,7 @@ func main() {
 
 	err = srv.ListenAndServe()
 	if err != nil {
-		app.Logger.Error("Failed to start server", "msg", err.Error())
+		app.Logger.Error("Failed to start server", "error", err.Error())
 		os.Exit(1)
 	}
 }
