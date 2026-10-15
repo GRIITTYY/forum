@@ -6,14 +6,14 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/griittyy/forum/internals/database"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/griittyy/forum/internal/database"
+	"github.com/griittyy/forum/internal/models"
 )
 
 type Application struct {
-	DBPool *pgxpool.Pool
-	Logger *slog.Logger
-	Config Config
+	Logger    *slog.Logger
+	Config    Config
+	UserModel *models.UserModel
 }
 
 type Config struct {
@@ -40,9 +40,9 @@ func main() {
 	}
 
 	app := &Application{
-		Logger: logger,
-		DBPool: dbPool,
-		Config: config,
+		Logger:    logger,
+		Config:    config,
+		UserModel: &models.UserModel{DBPool: dbPool},
 	}
 
 	srv := http.Server{
