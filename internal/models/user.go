@@ -1,6 +1,8 @@
 package models
 
 import (
+	"net/http"
+
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -16,7 +18,6 @@ type UserModel struct {
 	DBPool *pgxpool.Pool
 }
 
-// func (u *UserModel) NewUser(data UserRegistrationData) (jsonResponse, error) {
-
-// }
-
+func (u *UserModel) RegisterNewUser(r *http.Request, data UserRegistrationData) error {
+	stmt := `INSERT INTO auth(email, username, name, password) VALUES($1, $2, $3, $4)`
+}

@@ -1,0 +1,26 @@
+meta {
+  name: healthcheck
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:5500/v1/register
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "me@sam.com",
+    "name": "Samuel Momoh",
+    "username": "Grittyy",
+    "password": "testing1234",
+    "confirm-password": "testing1234"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

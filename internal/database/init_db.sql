@@ -1,4 +1,4 @@
-DROP DATABASE IF EXISTS forum_db;
+DROP DATABASE forum_db;
 
 CREATE DATABASE forum_db;
 
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS auth (
     username VARCHAR(100) NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
     password CHAR(60) NOT NULL,
-    join_date TIMESTAMPTZ NOT NULL
+    join_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 

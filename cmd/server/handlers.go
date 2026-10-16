@@ -42,7 +42,7 @@ func (app *Application) Register(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			app.ClientError(w, "request body contains badly formed JSON", http.StatusBadRequest)
+			app.ClientError(w, "request body contains badly formed JSON or may be INCOMPLETE", http.StatusBadRequest)
 			return
 		}
 
@@ -55,6 +55,9 @@ func (app *Application) Register(w http.ResponseWriter, r *http.Request) {
 		writeJson(w, result, http.StatusBadRequest)
 		return
 	}
+
+
+	
 
 	var response = map[string]string{
 		"message": "user successfully registered",
