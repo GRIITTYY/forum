@@ -2,6 +2,10 @@ package main
 
 import (
 	"encoding/json/v2"
+	"errors"
+	"fmt"
+	"io"
+	"log"
 	"net/http"
 
 	"github.com/griittyy/forum/internal/models"
@@ -22,6 +26,26 @@ func (app *Application) Register(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.UnmarshalRead(r.Body, &regData, json.RejectUnknownMembers(true)); err != nil {
 		app.LogError(r, "register request JSON could not be decoded", err)
+		log.Printf("JSON Unmarshalling Error: %T\n", err)
+		log.Printf("JSON Unmarshalling Error: %v\n", err)
+
+		if errors.Is(err, io.ErrUnexpectedEOF) {
+			app.ClientError(w, "request body must not be empty", http.StatusBadRequest)
+			return
+		}
+
+		var semErr *json.SemanticError
+		if errors.As(err, &semErr) {
+			if semErr.Err == json.ErrUnknownName {
+				msg := fmt.Sprintf("request body contains unsupported field: %v", semErr.JSONPointer)
+				app.ClientError(w, msg, http.StatusBadRequest)
+				return
+			}
+
+			app.ClientError(w, "request body contains badly formed JSON", http.StatusBadRequest)
+			return
+		}
+
 		app.ClientError(w, err.Error(), http.StatusBadRequest)
 		return
 	}

@@ -9,7 +9,7 @@ type RegValidationErrors struct {
 	Username        string `json:"username,omitzero"`
 	Name            string `json:"name,omitzero"`
 	Password        string `json:"password,omitzero"`
-	ConfirmPassword string `json:"confirm_password,omitzero"`
+	ConfirmPassword string `json:"confirm-password,omitzero"`
 }
 
 type RegValidationResult struct {
@@ -46,7 +46,9 @@ func ValidateRegistrationData(userRegData models.UserRegistrationData) RegValida
 		errors.Password = "The length of the provided password must be 8 characters or more."
 	}
 
-	if !Matches(userRegData.Password, userRegData.ConfirmPassword) {
+	if IsEmpty(userRegData.ConfirmPassword) {
+		errors.ConfirmPassword = "This field cannot be empty"
+	} else if !Matches(userRegData.Password, userRegData.ConfirmPassword) {
 		errors.ConfirmPassword = "This field must match the provided password"
 	}
 

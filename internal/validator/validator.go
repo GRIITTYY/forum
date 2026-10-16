@@ -11,7 +11,8 @@ func IsEmpty(value string) bool {
 }
 
 func IsEmptyStruct(data RegValidationResult) bool {
-	return data == RegValidationResult{}
+	var empty = RegValidationErrors{}
+	return data.Errors == empty
 }
 
 func ContainsSpaces(value string) bool {
