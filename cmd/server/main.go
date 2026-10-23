@@ -5,15 +5,19 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/alexedwards/scs/pgxstore"
+	"github.com/alexedwards/scs/v2"
 	"github.com/griittyy/forum/internal/database"
 	"github.com/griittyy/forum/internal/models"
 )
 
 type Application struct {
-	Logger    *slog.Logger
-	Config    Config
-	UserModel *models.UserModel
+	Logger         *slog.Logger
+	Config         Config
+	UserModel      *models.UserModel
+	SessionManager *scs.SessionManager
 }
 
 type Config struct {
@@ -39,10 +43,18 @@ func main() {
 		os.Exit(1)
 	}
 
+	sessionManager := scs.New()
+	sessionManager.Store = pgxstore.New(dbPool)
+	sessionManager.Lifetime = 48 * time.Hour
+	sessionManager.Cookie.HttpOnly = true
+	sessionManager.Cookie.Path = "/"
+	sessionManager.Cookie.SameSite = http.SameSiteStrictMode
+
 	app := &Application{
-		Logger:    logger,
-		Config:    config,
-		UserModel: &models.UserModel{DBPool: dbPool},
+		Logger:         logger,
+		Config:         config,
+		UserModel:      &models.UserModel{DBPool: dbPool},
+		SessionManager: sessionManager,
 	}
 
 	srv := http.Server{

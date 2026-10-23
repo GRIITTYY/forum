@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/griittyy/forum/internal/models"
 	"github.com/griittyy/forum/internal/validator"
@@ -23,11 +23,10 @@ func (app *Application) Healthcheck(w http.ResponseWriter, r *http.Request) {
 
 func (app *Application) Register(w http.ResponseWriter, r *http.Request) {
 	var regData models.UserRegistrationData
+	var response = make(map[string]string)
 
 	if err := json.UnmarshalRead(r.Body, &regData, json.RejectUnknownMembers(true)); err != nil {
 		app.LogError(r, "register request JSON could not be decoded", err)
-		log.Printf("JSON Unmarshalling Error: %T\n", err)
-		log.Printf("JSON Unmarshalling Error: %v\n", err)
 
 		if errors.Is(err, io.ErrUnexpectedEOF) {
 			app.ClientError(w, "request body must not be empty", http.StatusBadRequest)
@@ -56,11 +55,28 @@ func (app *Application) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
-	
-
-	var response = map[string]string{
-		"message": "user successfully registered",
+	hashPassword, err := generatePWHash(regData.Password)
+	if err != nil {
+		app.LogError(r, "error with argon2id", err)
+		app.ServerError(w, "An error occured while processing your request.", http.StatusInternalServerError)
+		return
 	}
+	regData.Password = hashPassword
+
+	userId, err := app.UserModel.RegisterNewUser(r.Context(), regData)
+	if err != nil {
+		if errors.Is(err, models.ErrEmailExists) || errors.Is(err, models.ErrUsernameExists) {
+			response["message"] = err.Error()
+			writeJson(w, response, http.StatusCreated)
+			return
+		}
+
+		app.LogError(r, "error with inserting new user record", err)
+		app.ServerError(w, "An error occured while processing your request.", http.StatusInternalServerError)
+		return
+	}
+
+	response["message"] = "welcome to forum, you have registered successfully"
+	response["user_id"] = strconv.Itoa(userId)
 	writeJson(w, response, http.StatusCreated)
 }
